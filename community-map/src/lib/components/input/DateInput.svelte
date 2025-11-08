@@ -14,12 +14,12 @@
 	}
 </script>
 
-<div class="flex flex-col gap-1.5">
-	<label class="text-sm font-medium text-gray-700">{label}</label>
+<div class="flex flex-col gap-1">
+	<label class="text-xs font-medium text-gray-700">{label}</label>
 	<input
 		type="datetime-local"
 		{value}
 		oninput={handleInput}
-		class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+		class="px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-transparent"
 	/>
 </div>

@@ -246,7 +246,8 @@
 			map.on('click', (e) => {
 				if (mapToolsStore.selectedTool) {
 					const { lng, lat } = e.lngLat;
-					mapToolsStore.openDialogue({ lng, lat });
+					const { x, y } = e.point;
+					mapToolsStore.openDialogue({ lng, lat }, { x, y });
 				}
 			});
 		});
