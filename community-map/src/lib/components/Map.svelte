@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import maplibregl from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
+	import { mapToolsStore } from '$lib/stores/mapTools.svelte';
 
 	let mapContainer: HTMLDivElement;
 	let map: maplibregl.Map;
@@ -210,20 +211,59 @@
 
 			// Change cursor on hover for districts
 			map.on('mouseenter', 'congress-fill', () => {
-				map.getCanvas().style.cursor = 'pointer';
+				if (!mapToolsStore.selectedTool) {
+					map.getCanvas().style.cursor = 'pointer';
+				}
 			});
 
 			map.on('mouseleave', 'congress-fill', () => {
-				map.getCanvas().style.cursor = '';
+				if (!mapToolsStore.selectedTool) {
+					map.getCanvas().style.cursor = '';
+				}
 			});
 
 			// Change cursor on hover for cities
 			map.on('mouseenter', 'cities-circle', () => {
-				map.getCanvas().style.cursor = 'pointer';
+				if (!mapToolsStore.selectedTool) {
+					map.getCanvas().style.cursor = 'pointer';
+				}
 			});
 
 			map.on('mouseleave', 'cities-circle', () => {
-				map.getCanvas().style.cursor = '';
+				if (!mapToolsStore.selectedTool) {
+					map.getCanvas().style.cursor = '';
+				}
+			});
+
+			// Update cursor to crosshair when a tool is selected
+			map.on('mousemove', () => {
+				if (mapToolsStore.selectedTool) {
+					map.getCanvas().style.cursor = 'crosshair';
+				}
+			});
+
+			// Handle map clicks for placing markers when a tool is selected
+			map.on('click', (e) => {
+				if (mapToolsStore.selectedTool) {
+					const { lng, lat } = e.lngLat;
+					console.log(`Tool: ${mapToolsStore.selectedTool}, Coordinates: [${lng}, ${lat}]`);
+
+					// Add a temporary marker at the clicked location
+					new maplibregl.Marker()
+						.setLngLat([lng, lat])
+						.setPopup(
+							new maplibregl.Popup().setHTML(
+								`
+								<div style="padding: 8px;">
+									<h3 style="margin: 0 0 8px 0; font-weight: 600;">${mapToolsStore.selectedTool}</h3>
+									<p style="margin: 4px 0;"><strong>Latitude:</strong> ${lat.toFixed(6)}</p>
+									<p style="margin: 4px 0;"><strong>Longitude:</strong> ${lng.toFixed(6)}</p>
+								</div>
+								`
+							)
+						)
+						.addTo(map);
+				}
 			});
 		});
 
