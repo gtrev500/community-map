@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgis/postgis:18-3.6
+    container_name: postgis
+    environment:
+      POSTGRES_DB: gis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gis_network
+
+  martin:
+    image: ghcr.io/maplibre/martin:latest
+    container_name: martin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/gis
+    ports:
+      - "3000:3000"
+    command:
+      - --listen-addresses
+      - 0.0.0.0:3000
+      - --auto-publish
+      - schemas=public,tiger
+    networks:
+      - gis_network
+
+volumes:
+  postgres_data:
+
+networks:
+  gis_network:
+    driver: bridge
+
