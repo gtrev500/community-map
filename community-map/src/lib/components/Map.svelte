@@ -242,27 +242,11 @@
 				}
 			});
 
-			// Handle map clicks for placing markers when a tool is selected
+			// Handle map clicks to open dialogue when a tool is selected
 			map.on('click', (e) => {
 				if (mapToolsStore.selectedTool) {
 					const { lng, lat } = e.lngLat;
-					console.log(`Tool: ${mapToolsStore.selectedTool}, Coordinates: [${lng}, ${lat}]`);
-
-					// Add a temporary marker at the clicked location
-					new maplibregl.Marker()
-						.setLngLat([lng, lat])
-						.setPopup(
-							new maplibregl.Popup().setHTML(
-								`
-								<div style="padding: 8px;">
-									<h3 style="margin: 0 0 8px 0; font-weight: 600;">${mapToolsStore.selectedTool}</h3>
-									<p style="margin: 4px 0;"><strong>Latitude:</strong> ${lat.toFixed(6)}</p>
-									<p style="margin: 4px 0;"><strong>Longitude:</strong> ${lng.toFixed(6)}</p>
-								</div>
-								`
-							)
-						)
-						.addTo(map);
+					mapToolsStore.openDialogue({ lng, lat });
 				}
 			});
 		});
