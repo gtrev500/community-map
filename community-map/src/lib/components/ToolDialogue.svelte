@@ -236,9 +236,31 @@
 		role="dialog"
 		tabindex="-1"
 	>
+		<!-- Close X button (top right) -->
+		<button
+			onclick={handleCancel}
+			class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+			aria-label="Close"
+			title="Close"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="w-3.5 h-3.5"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<line x1="18" y1="6" x2="6" y2="18"></line>
+				<line x1="6" y1="6" x2="18" y2="18"></line>
+			</svg>
+		</button>
+
 		{#if mapToolsStore.dialogueMode === 'create-location'}
 			<!-- CREATE MODE: New Location Form -->
-			<h3 class="text-sm font-semibold mb-2">{mapToolsStore.selectedTool}</h3>
+			<h3 class="text-sm font-semibold mb-2 pr-6">{mapToolsStore.selectedTool}</h3>
 
 			<!-- Coordinates display -->
 			{#if mapToolsStore.clickedCoordinates}
@@ -291,7 +313,7 @@
 
 		{:else if mapToolsStore.dialogueMode === 'view-location' && locationData}
 			<!-- VIEW MODE: Location Details & Comments -->
-			<h3 class="text-sm font-semibold mb-2">{locationData.tool_type}</h3>
+			<h3 class="text-sm font-semibold mb-2 pr-6">{locationData.tool_type}</h3>
 
 			<!-- Location Details -->
 			<div class="mb-3 p-2 bg-gray-50 rounded text-xs space-y-1">
