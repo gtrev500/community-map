@@ -171,7 +171,7 @@
 				showZoom: true, // Keep zoom buttons
 				visualizePitch: false // Don't show pitch indicator
 			}),
-			'top-right'
+			'top-left'
 		);
 
 		// Wait for map to load before adding layers
