@@ -42,6 +42,10 @@ export const mapToolsStore = {
 	},
 	clearSelection() {
 		selectedTool = null;
+		// Also close dialogue and clear any pending location if open
+		if (dialogueOpen && dialogueMode === 'create-location') {
+			this.closeDialogue();
+		}
 	},
 	openDialogue(coordinates: Coordinates, position: ScreenPosition) {
 		clickedCoordinates = coordinates;

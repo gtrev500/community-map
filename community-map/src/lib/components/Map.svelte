@@ -397,6 +397,9 @@
 			map.on('mousemove', () => {
 				if (mapToolsStore.selectedTool) {
 					map.getCanvas().style.cursor = 'crosshair';
+				} else {
+					// Reset to default cursor when no tool is selected
+					map.getCanvas().style.cursor = '';
 				}
 			});
 
