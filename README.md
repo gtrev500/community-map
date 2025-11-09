@@ -1,13 +1,13 @@
 # Community Map
 
-An interactive web application for mapping and tracking community resources across California, including ICE facilities, homeless shelters, and food banks. Users can add locations, view existing markers, and engage through comments.
+An interactive web application for mapping and tracking community resources across California, including ice sightings, homeless shelters, and food banks. Users can add locations, view existing markers, and engage through comments.
 
 ## Features
 
 - **Interactive Map Interface**: MapLibre GL-based map of California with district boundaries
 - **Location Management**: Add and view community resource locations with detailed information
 - **Three Resource Types**:
-  - ICE Facilities (with agent count)
+  - Ice sightings (with agent count)
   - Homeless Shelters
   - Food Banks (with operating hours)
 - **Comments System**: View location details and add comments to existing locations
@@ -102,12 +102,12 @@ The application will be available at http://localhost:5173
 
 ### Adding a Location
 
-1. Select a resource type from the toolbar (Ice, Homeless Shelter, or Food Bank)
+1. Select a resource type from the toolbar (Ice sighting, Homeless Shelter, or Food Bank)
 2. Click anywhere on the California map
 3. A preview pin appears and a dialogue opens
 4. Fill in the form:
    - **Note**: Optional description
-   - **Agents**: Number of agents (ICE facilities only)
+   - **Agents**: Number of agents (ice sightings only)
    - **Hours**: Operating hours (Food banks only)
 5. Click "Save" to add the location
 
@@ -142,7 +142,7 @@ Retrieve all locations.
   "data": [
     {
       "id": 1,
-      "tool_type": "Ice",
+      "tool_type": "Ice sighting",
       "latitude": 34.0522,
       "longitude": -118.2437,
       "note": "Downtown facility",
@@ -161,7 +161,7 @@ Create a new location.
 **Request:**
 ```json
 {
-  "tool": "Ice",
+  "tool": "Ice sighting",
   "coordinates": [-118.2437, 34.0522],
   "note": "Optional note",
   "agents": 5,
@@ -175,7 +175,7 @@ Create a new location.
   "success": true,
   "data": {
     "id": 1,
-    "tool_type": "Ice",
+    "tool_type": "Ice sighting",
     "city_name": "Los Angeles",
     ...
   }
@@ -289,7 +289,7 @@ curl http://localhost:5173/api/locations
 # Add a location
 curl -X POST http://localhost:5173/api/locations \
   -H "Content-Type: application/json" \
-  -d '{"tool":"Ice","coordinates":[-118.2437,34.0522],"agents":5}'
+  -d '{"tool":"Ice sighting","coordinates":[-118.2437,34.0522],"agents":5}'
 
 # Get comments
 curl http://localhost:5173/api/comments?location_id=1
