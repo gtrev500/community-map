@@ -87,12 +87,12 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Call the SQL function to insert the location
 		const [result] = await sql`
 			SELECT * FROM insert_location(
-				${data.tool},
-				${latitude},
-				${longitude},
-				${data.note || null},
-				${data.agents || null},
-				${data.hours || null}
+				${data.tool}::TEXT,
+				${latitude}::DOUBLE PRECISION,
+				${longitude}::DOUBLE PRECISION,
+				${data.note || null}::TEXT,
+				${data.agents || null}::INTEGER,
+				${data.hours || null}::TEXT
 			)
 		`;
 
