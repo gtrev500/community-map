@@ -1,8 +1,8 @@
 <script lang="ts">
 	const toolTypes = [
-		{ name: 'Ice', color: '#e74c3c', icon: '🏛️' },
-		{ name: 'Homeless Shelter', color: '#3498db', icon: '🏠' },
-		{ name: 'Food bank', color: '#27ae60', icon: '🍎' }
+		{ name: 'Ice', color: '#e74c3c'},
+		{ name: 'Homeless Shelter', color: '#3498db'},
+		{ name: 'Food bank', color: '#27ae60' }
 	];
 </script>
 
@@ -15,7 +15,7 @@
 					class="w-3 h-3 rounded-full border-2 border-white"
 					style="background-color: {tool.color}; box-shadow: 0 1px 3px rgba(0,0,0,0.3);"
 				></div>
-				<span class="text-gray-700">{tool.icon} {tool.name}</span>
+				<span class="text-gray-700">{tool.name}</span>
 			</div>
 		{/each}
 	</div>

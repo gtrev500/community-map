@@ -35,7 +35,7 @@
 
 			<p class="text-xl text-[hsl(210,12%,50%)] mb-10 leading-relaxed max-w-2xl mx-auto">
 				Start exploring our interactive map to discover resources in your area.
-				No registration required—just compassionate support when you need it.
+				Community-maintained map of assistance.
 			</p>
 
 			<div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -61,7 +61,7 @@
 					Launch Resource Finder
 				</button>
 				<button class="text-lg px-10 py-6 rounded-lg font-medium cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] inline-flex items-center justify-center gap-2 bg-transparent text-[hsl(210,15%,15%)] border-2 border-[hsl(210,20%,90%)] hover:bg-[hsl(210,20%,96%)]">
-					Contact Support
+					Learn More
 				</button>
 			</div>
 
