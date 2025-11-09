@@ -156,11 +156,23 @@
 			},
 			maxBounds: californiaBounds, // Prevent panning outside California
 			minZoom: 6,
-			maxZoom: 14
+			maxZoom: 14,
+			pitch: 0, // Keep map flat, no 3D tilt
+			bearing: 0, // Always point north
+			pitchWithRotate: false, // Disable pitch control
+			dragRotate: false, // Disable rotation
+			touchPitch: false // Disable pitch on touch devices
 		});
 
-		// Add navigation controls
-		map.addControl(new maplibregl.NavigationControl(), 'top-right');
+		// Add navigation controls (zoom only, no rotation/pitch)
+		map.addControl(
+			new maplibregl.NavigationControl({
+				showCompass: false, // Hide compass/rotation control
+				showZoom: true, // Keep zoom buttons
+				visualizePitch: false // Don't show pitch indicator
+			}),
+			'top-right'
+		);
 
 		// Wait for map to load before adding layers
 		map.on('load', () => {
@@ -328,34 +340,17 @@
 
 			// Add click interaction for user locations
 			map.on('click', 'user-locations-circle', (e) => {
+				// Prevent triggering map click handler when clicking on a location
+				e.preventDefault();
+
 				if (e.features && e.features.length > 0) {
 					const feature = e.features[0];
 					const props = feature.properties;
+					const { lng, lat } = e.lngLat;
+					const { x, y } = e.point;
 
-					let html = `
-						<div style="padding: 8px;">
-							<h3 style="margin: 0 0 8px 0; font-weight: 600;">${props.tool_type}</h3>
-					`;
-
-					if (props.city_name) {
-						html += `<p style="margin: 4px 0;"><strong>City:</strong> ${props.city_name}</p>`;
-					}
-					if (props.note) {
-						html += `<p style="margin: 4px 0;"><strong>Note:</strong> ${props.note}</p>`;
-					}
-					if (props.agents !== null && props.tool_type === 'Ice') {
-						html += `<p style="margin: 4px 0;"><strong>Agents:</strong> ${props.agents}</p>`;
-					}
-					if (props.hours && props.tool_type === 'Food bank') {
-						html += `<p style="margin: 4px 0;"><strong>Hours:</strong> ${new Date(props.hours).toLocaleString()}</p>`;
-					}
-
-					html += `</div>`;
-
-					new maplibregl.Popup()
-						.setLngLat(e.lngLat)
-						.setHTML(html)
-						.addTo(map);
+					// Open dialogue in view mode to show location details and comments
+					mapToolsStore.openLocationView(props.id, { lng, lat }, { x, y });
 				}
 			});
 
