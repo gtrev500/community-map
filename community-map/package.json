@@ -9,7 +9,8 @@
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"migrate": "tsx ../scripts/migrate.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.0",
@@ -19,10 +20,12 @@
 		"svelte": "^5.41.0",
 		"svelte-check": "^4.3.3",
 		"tailwindcss": "^4.1.14",
+		"tsx": "^4.20.6",
 		"typescript": "^5.9.3",
 		"vite": "^7.1.10"
 	},
 	"dependencies": {
-		"maplibre-gl": "^5.11.0"
+		"maplibre-gl": "^5.11.0",
+		"postgres": "^3.4.7"
 	}
 }

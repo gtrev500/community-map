@@ -9,6 +9,10 @@
 	let agents = $state(0);
 	let hours = $state('');
 
+	// Loading and error states
+	let isLoading = $state(false);
+	let error = $state<string | null>(null);
+
 	let dialogueElement: HTMLDivElement;
 
 	// Calculate position with offset and boundary checking
@@ -33,21 +37,49 @@
 		return `left: ${x}px; top: ${y}px;`;
 	});
 
-	function handleSave() {
+	async function handleSave() {
+		if (!mapToolsStore.clickedCoordinates) return;
+
 		const data = {
 			tool: mapToolsStore.selectedTool,
-			coordinates: mapToolsStore.clickedCoordinates,
-			note,
+			coordinates: [
+				mapToolsStore.clickedCoordinates.lng,
+				mapToolsStore.clickedCoordinates.lat
+			] as [number, number],
+			note: note || undefined,
 			...(mapToolsStore.selectedTool === 'Ice' && { agents }),
 			...(mapToolsStore.selectedTool === 'Food bank' && { hours })
 		};
 
-		console.log('Saving data:', data);
+		isLoading = true;
+		error = null;
 
-		// TODO: Send to API
-		// Reset form and close dialogue
-		resetForm();
-		mapToolsStore.closeDialogue();
+		try {
+			const response = await fetch('/api/locations', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({ message: 'Failed to save location' }));
+				throw new Error(errorData.message || 'Failed to save location');
+			}
+
+			const result = await response.json();
+			console.log('Location saved successfully:', result);
+
+			// Reset form and close dialogue
+			resetForm();
+			mapToolsStore.closeDialogue();
+		} catch (err) {
+			console.error('Error saving location:', err);
+			error = err instanceof Error ? err.message : 'Failed to save location';
+		} finally {
+			isLoading = false;
+		}
 	}
 
 	function handleCancel() {
@@ -59,6 +91,8 @@
 		note = '';
 		agents = 0;
 		hours = '';
+		error = null;
+		isLoading = false;
 	}
 
 	// Close on escape key
@@ -93,6 +127,13 @@
 			</div>
 		{/if}
 
+		<!-- Error message -->
+		{#if error}
+			<div class="mb-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+				{error}
+			</div>
+		{/if}
+
 		<!-- Dynamic fields based on tool type -->
 		<div class="flex flex-col gap-2 mb-3">
 			{#if mapToolsStore.selectedTool === 'Ice'}
@@ -109,16 +150,18 @@
 		<!-- Actions -->
 		<div class="flex gap-2 justify-end">
 			<button
-				class="px-2.5 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+				class="px-2.5 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 				onclick={handleCancel}
+				disabled={isLoading}
 			>
 				Cancel
 			</button>
 			<button
-				class="px-2.5 py-1 text-xs bg-teal-700 text-white rounded hover:bg-teal-800 transition-colors"
+				class="px-2.5 py-1 text-xs bg-teal-700 text-white rounded hover:bg-teal-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 				onclick={handleSave}
+				disabled={isLoading}
 			>
-				Save
+				{isLoading ? 'Saving...' : 'Save'}
 			</button>
 		</div>
 	</div>

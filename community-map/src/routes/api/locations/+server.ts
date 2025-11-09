@@ -1,0 +1,70 @@
+/**
+ * API endpoint for managing user-submitted locations
+ * POST /api/locations - Create a new location marker
+ */
+
+import { json, error } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import sql from '$lib/server/db';
+
+interface LocationRequest {
+	tool: string;
+	coordinates: [number, number]; // [lng, lat]
+	note?: string;
+	agents?: number;
+	hours?: string;
+}
+
+export const POST: RequestHandler = async ({ request }) => {
+	try {
+		const data: LocationRequest = await request.json();
+
+		// Validate required fields
+		if (!data.tool || !data.coordinates || data.coordinates.length !== 2) {
+			return error(400, 'Missing required fields: tool and coordinates');
+		}
+
+		const [longitude, latitude] = data.coordinates;
+
+		// Validate coordinates
+		if (
+			typeof latitude !== 'number' ||
+			typeof longitude !== 'number' ||
+			latitude < -90 ||
+			latitude > 90 ||
+			longitude < -180 ||
+			longitude > 180
+		) {
+			return error(400, 'Invalid coordinates');
+		}
+
+		// Validate tool type
+		const validTools = ['Ice', 'Homeless Shelter', 'Food bank'];
+		if (!validTools.includes(data.tool)) {
+			return error(400, `Invalid tool type. Must be one of: ${validTools.join(', ')}`);
+		}
+
+		// Call the SQL function to insert the location
+		const [result] = await sql`
+			SELECT * FROM insert_location(
+				${data.tool},
+				${latitude},
+				${longitude},
+				${data.note || null},
+				${data.agents || null},
+				${data.hours || null}
+			)
+		`;
+
+		return json(
+			{
+				success: true,
+				data: result
+			},
+			{ status: 201 }
+		);
+	} catch (err) {
+		console.error('Error creating location:', err);
+		return error(500, 'Failed to create location');
+	}
+};
