@@ -11,7 +11,7 @@
 
 	// Tool type color mapping
 	const toolColors: Record<string, string> = {
-		'Ice': '#e74c3c',
+		'Ice sighting': '#e74c3c',
 		'Homeless Shelter': '#3498db',
 		'Food bank': '#27ae60'
 	};
@@ -283,7 +283,7 @@
 					'circle-color': [
 						'match',
 						['get', 'tool_type'],
-						'Ice', '#e74c3c',
+						'Ice sighting', '#e74c3c',
 						'Homeless Shelter', '#3498db',
 						'Food bank', '#27ae60',
 						'#888' // default

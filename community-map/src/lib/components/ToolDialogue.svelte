@@ -134,7 +134,7 @@
 				mapToolsStore.clickedCoordinates.lat
 			] as [number, number],
 			note: note || undefined,
-			...(mapToolsStore.selectedTool === 'Ice' && { agents }),
+			...(mapToolsStore.selectedTool === 'Ice sighting' && { agents }),
 			...(mapToolsStore.selectedTool === 'Food bank' && { hours })
 		};
 
@@ -330,7 +330,7 @@
 
 			<!-- Dynamic fields based on tool type -->
 			<div class="flex flex-col gap-2 mb-3">
-				{#if mapToolsStore.selectedTool === 'Ice'}
+				{#if mapToolsStore.selectedTool === 'Ice sighting'}
 					<TextInput label="Note" bind:value={note} placeholder="Enter note..." />
 					<NumberInput label="Agents" bind:value={agents} min={0} placeholder="Number of agents" />
 				{:else if mapToolsStore.selectedTool === 'Food bank'}
@@ -371,7 +371,7 @@
 				{#if locationData.note}
 					<p class="text-gray-700"><strong>Note:</strong> {locationData.note}</p>
 				{/if}
-				{#if locationData.agents !== null && locationData.tool_type === 'Ice'}
+				{#if locationData.agents !== null && locationData.tool_type === 'Ice sighting'}
 					<p class="text-gray-700"><strong>Agents:</strong> {locationData.agents}</p>
 				{/if}
 				{#if locationData.hours && locationData.tool_type === 'Food bank'}

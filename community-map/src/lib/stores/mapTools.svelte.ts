@@ -1,4 +1,4 @@
-export type ToolType = 'Ice' | 'Homeless Shelter' | 'Food bank' | null;
+export type ToolType = 'Ice sighting' | 'Homeless Shelter' | 'Food bank' | null;
 export type DialogueMode = 'create-location' | 'view-location';
 
 export interface Coordinates {

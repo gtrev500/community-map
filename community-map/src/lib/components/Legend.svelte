@@ -1,6 +1,6 @@
 <script lang="ts">
 	const toolTypes = [
-		{ name: 'Ice', color: '#e74c3c'},
+		{ name: 'Ice sighting', color: '#e74c3c'},
 		{ name: 'Homeless Shelter', color: '#3498db'},
 		{ name: 'Food bank', color: '#27ae60' }
 	];

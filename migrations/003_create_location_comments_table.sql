@@ -26,12 +26,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_location_comment_timestamp ON location_comments;
 CREATE TRIGGER trigger_update_location_comment_timestamp
     BEFORE UPDATE ON location_comments
     FOR EACH ROW
     EXECUTE FUNCTION update_location_comment_timestamp();
 
-COMMENT ON TABLE location_comments IS 'User-submitted comments for locations (Ice facilities, homeless shelters, food banks)';
+COMMENT ON TABLE location_comments IS 'User-submitted comments for locations (ice sightings, homeless shelters, food banks)';
 COMMENT ON COLUMN location_comments.location_id IS 'Foreign key to user_locations table';
 COMMENT ON COLUMN location_comments.comment_text IS 'The comment content (required, non-empty)';
 COMMENT ON COLUMN location_comments.author_name IS 'Optional author name for future user attribution';

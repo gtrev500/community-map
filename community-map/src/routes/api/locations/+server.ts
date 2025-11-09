@@ -79,7 +79,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Validate tool type
-		const validTools = ['Ice', 'Homeless Shelter', 'Food bank'];
+		const validTools = ['Ice sighting', 'Homeless Shelter', 'Food bank'];
 		if (!validTools.includes(data.tool)) {
 			return error(400, `Invalid tool type. Must be one of: ${validTools.join(', ')}`);
 		}

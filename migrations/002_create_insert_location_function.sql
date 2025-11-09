@@ -67,4 +67,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-COMMENT ON FUNCTION insert_location IS 'Inserts a new user location, auto-generates geometry, and determines nearest city';
+COMMENT ON FUNCTION insert_location(TEXT, DOUBLE PRECISION, DOUBLE PRECISION, TEXT, INTEGER, TEXT) IS 'Inserts a new user location, auto-generates geometry, and determines nearest city';

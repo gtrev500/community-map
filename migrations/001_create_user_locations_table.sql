@@ -2,7 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS user_locations (
     id BIGSERIAL PRIMARY KEY,
-    tool_type TEXT NOT NULL CHECK (tool_type IN ('Ice', 'Homeless Shelter', 'Food bank')),
+    tool_type TEXT NOT NULL CHECK (tool_type IN ('Ice sighting', 'Homeless Shelter', 'Food bank')),
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
     geometry geometry(Point, 4326) NOT NULL,
@@ -25,9 +25,9 @@ CREATE INDEX IF NOT EXISTS idx_user_locations_tool_type
 CREATE INDEX IF NOT EXISTS idx_user_locations_created_at
     ON user_locations (created_at DESC);
 
-COMMENT ON TABLE user_locations IS 'Stores user-submitted locations for Ice facilities, homeless shelters, and food banks';
-COMMENT ON COLUMN user_locations.tool_type IS 'Type of facility: Ice, Homeless Shelter, or Food bank';
+COMMENT ON TABLE user_locations IS 'Stores user-submitted locations for ice sightings, homeless shelters, and food banks';
+COMMENT ON COLUMN user_locations.tool_type IS 'Type of facility: Ice sighting, Homeless Shelter, or Food bank';
 COMMENT ON COLUMN user_locations.geometry IS 'PostGIS point geometry (SRID 4326)';
-COMMENT ON COLUMN user_locations.agents IS 'Number of agents (Ice facilities only)';
+COMMENT ON COLUMN user_locations.agents IS 'Number of agents (ice sightings only)';
 COMMENT ON COLUMN user_locations.hours IS 'Operating hours (Food banks only)';
 COMMENT ON COLUMN user_locations.city_name IS 'City name determined via spatial query against ca_cities';
