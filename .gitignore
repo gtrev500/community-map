@@ -1,2 +1,6 @@
 district-data/
 node_modules/
+
+# Large data files
+boundaries/*.csv
+boundaries/*.zip
