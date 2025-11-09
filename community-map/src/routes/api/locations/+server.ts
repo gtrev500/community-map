@@ -1,5 +1,6 @@
 /**
  * API endpoint for managing user-submitted locations
+ * GET /api/locations - Retrieve all location markers
  * POST /api/locations - Create a new location marker
  */
 
@@ -14,6 +15,45 @@ interface LocationRequest {
 	agents?: number;
 	hours?: string;
 }
+
+interface LocationRecord {
+	id: number;
+	tool_type: string;
+	latitude: number;
+	longitude: number;
+	note: string | null;
+	agents: number | null;
+	hours: string | null;
+	city_name: string | null;
+	created_at: string;
+}
+
+export const GET: RequestHandler = async () => {
+	try {
+		const locations = await sql<LocationRecord[]>`
+			SELECT
+				id,
+				tool_type,
+				latitude,
+				longitude,
+				note,
+				agents,
+				hours,
+				city_name,
+				created_at
+			FROM user_locations
+			ORDER BY created_at DESC
+		`;
+
+		return json({
+			success: true,
+			data: locations
+		});
+	} catch (err) {
+		console.error('Error fetching locations:', err);
+		return error(500, 'Failed to fetch locations');
+	}
+};
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {

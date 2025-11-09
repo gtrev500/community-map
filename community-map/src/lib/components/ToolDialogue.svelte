@@ -3,6 +3,13 @@
 	import TextInput from './input/TextInput.svelte';
 	import NumberInput from './input/NumberInput.svelte';
 	import DateInput from './input/DateInput.svelte';
+	import type Map from './Map.svelte';
+
+	interface Props {
+		mapComponent?: Map;
+	}
+
+	let { mapComponent }: Props = $props();
 
 	// Form data
 	let note = $state('');
@@ -70,6 +77,11 @@
 
 			const result = await response.json();
 			console.log('Location saved successfully:', result);
+
+			// Refresh map to show new location
+			if (mapComponent) {
+				await mapComponent.refreshLocations();
+			}
 
 			// Reset form and close dialogue
 			resetForm();

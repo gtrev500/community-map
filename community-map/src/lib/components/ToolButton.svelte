@@ -1,6 +1,8 @@
 <script lang="ts">
+	import type { ToolType } from '$lib/stores/mapTools.svelte';
+
 	interface Props {
-		label: string;
+		label: Exclude<ToolType, null>; // Tool type excluding null
 		selected?: boolean;
 		onclick?: () => void;
 	}

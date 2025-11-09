@@ -2,9 +2,9 @@
 	import ToolButton from './ToolButton.svelte';
 	import { mapToolsStore, type ToolType } from '$lib/stores/mapTools.svelte';
 
-	const tools: ToolType[] = ['Ice', 'Homeless Shelter', 'Food bank'];
+	const tools: Exclude<ToolType, null>[] = ['Ice', 'Homeless Shelter', 'Food bank'];
 
-	function handleToolClick(tool: ToolType) {
+	function handleToolClick(tool: Exclude<ToolType, null>) {
 		if (mapToolsStore.selectedTool === tool) {
 			mapToolsStore.clearSelection();
 		} else {

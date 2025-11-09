@@ -3,9 +3,101 @@
 	import maplibregl from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { mapToolsStore } from '$lib/stores/mapTools.svelte';
+	import type { Map as MapLibreMap } from 'maplibre-gl';
 
 	let mapContainer: HTMLDivElement;
 	let map: maplibregl.Map;
+	let previewMarker: maplibregl.Marker | null = null;
+
+	// Tool type color mapping
+	const toolColors: Record<string, string> = {
+		'Ice': '#e74c3c',
+		'Homeless Shelter': '#3498db',
+		'Food bank': '#27ae60'
+	};
+
+	interface LocationData {
+		id: number;
+		tool_type: string;
+		latitude: number;
+		longitude: number;
+		note: string | null;
+		agents: number | null;
+		hours: string | null;
+		city_name: string | null;
+		created_at: string;
+	}
+
+	// Fetch locations from API
+	async function loadLocations(): Promise<GeoJSON.FeatureCollection> {
+		try {
+			const response = await fetch('/api/locations');
+			const result = await response.json();
+
+			if (!result.success) {
+				console.error('Failed to load locations');
+				return { type: 'FeatureCollection', features: [] };
+			}
+
+			const features: GeoJSON.Feature[] = result.data.map((loc: LocationData) => ({
+				type: 'Feature',
+				geometry: {
+					type: 'Point',
+					coordinates: [loc.longitude, loc.latitude]
+				},
+				properties: {
+					id: loc.id,
+					tool_type: loc.tool_type,
+					note: loc.note,
+					agents: loc.agents,
+					hours: loc.hours,
+					city_name: loc.city_name,
+					created_at: loc.created_at
+				}
+			}));
+
+			return {
+				type: 'FeatureCollection',
+				features
+			};
+		} catch (error) {
+			console.error('Error loading locations:', error);
+			return { type: 'FeatureCollection', features: [] };
+		}
+	}
+
+	// Refresh locations on the map
+	export async function refreshLocations() {
+		if (!map) return;
+
+		const locations = await loadLocations();
+		const source = map.getSource('user-locations') as maplibregl.GeoJSONSource;
+		if (source) {
+			source.setData(locations);
+		}
+	}
+
+	// Create a marker element for preview
+	function createMarkerElement(toolType: string): HTMLDivElement {
+		const el = document.createElement('div');
+		el.className = 'custom-marker';
+		el.style.width = '12px';
+		el.style.height = '12px';
+		el.style.borderRadius = '50%';
+		el.style.backgroundColor = toolColors[toolType] || '#888';
+		el.style.border = '2px solid white';
+		el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+		el.style.cursor = 'pointer';
+		return el;
+	}
+
+	// Remove preview marker when dialogue closes
+	$effect(() => {
+		if (!mapToolsStore.dialogueOpen && previewMarker) {
+			previewMarker.remove();
+			previewMarker = null;
+		}
+	});
 
 	onMount(() => {
 		// California bounds - restricts viewport to California only
@@ -41,6 +133,10 @@
 						tiles: ['http://localhost:3000/ca_cities/{z}/{x}/{y}'],
 						minzoom: 0,
 						maxzoom: 14
+					},
+					'user-locations': {
+						type: 'geojson',
+						data: { type: 'FeatureCollection', features: [] }
 					}
 				},
 				layers: [
@@ -165,6 +261,27 @@
 				}
 			});
 
+			// Add user location pins (circles)
+			map.addLayer({
+				id: 'user-locations-circle',
+				type: 'circle',
+				source: 'user-locations',
+				paint: {
+					'circle-radius': 6,
+					'circle-color': [
+						'match',
+						['get', 'tool_type'],
+						'Ice', '#e74c3c',
+						'Homeless Shelter', '#3498db',
+						'Food bank', '#27ae60',
+						'#888' // default
+					],
+					'circle-stroke-width': 2,
+					'circle-stroke-color': '#fff',
+					'circle-opacity': 0.9
+				}
+			});
+
 			// Add click interaction
 			map.on('click', 'congress-fill', (e) => {
 				if (e.features && e.features.length > 0) {
@@ -209,6 +326,39 @@
 				}
 			});
 
+			// Add click interaction for user locations
+			map.on('click', 'user-locations-circle', (e) => {
+				if (e.features && e.features.length > 0) {
+					const feature = e.features[0];
+					const props = feature.properties;
+
+					let html = `
+						<div style="padding: 8px;">
+							<h3 style="margin: 0 0 8px 0; font-weight: 600;">${props.tool_type}</h3>
+					`;
+
+					if (props.city_name) {
+						html += `<p style="margin: 4px 0;"><strong>City:</strong> ${props.city_name}</p>`;
+					}
+					if (props.note) {
+						html += `<p style="margin: 4px 0;"><strong>Note:</strong> ${props.note}</p>`;
+					}
+					if (props.agents !== null && props.tool_type === 'Ice') {
+						html += `<p style="margin: 4px 0;"><strong>Agents:</strong> ${props.agents}</p>`;
+					}
+					if (props.hours && props.tool_type === 'Food bank') {
+						html += `<p style="margin: 4px 0;"><strong>Hours:</strong> ${new Date(props.hours).toLocaleString()}</p>`;
+					}
+
+					html += `</div>`;
+
+					new maplibregl.Popup()
+						.setLngLat(e.lngLat)
+						.setHTML(html)
+						.addTo(map);
+				}
+			});
+
 			// Change cursor on hover for districts
 			map.on('mouseenter', 'congress-fill', () => {
 				if (!mapToolsStore.selectedTool) {
@@ -235,6 +385,19 @@
 				}
 			});
 
+			// Change cursor on hover for user locations
+			map.on('mouseenter', 'user-locations-circle', () => {
+				if (!mapToolsStore.selectedTool) {
+					map.getCanvas().style.cursor = 'pointer';
+				}
+			});
+
+			map.on('mouseleave', 'user-locations-circle', () => {
+				if (!mapToolsStore.selectedTool) {
+					map.getCanvas().style.cursor = '';
+				}
+			});
+
 			// Update cursor to crosshair when a tool is selected
 			map.on('mousemove', () => {
 				if (mapToolsStore.selectedTool) {
@@ -247,7 +410,27 @@
 				if (mapToolsStore.selectedTool) {
 					const { lng, lat } = e.lngLat;
 					const { x, y } = e.point;
+
+					// Remove existing preview marker
+					if (previewMarker) {
+						previewMarker.remove();
+					}
+
+					// Create and add preview marker at clicked location
+					const markerEl = createMarkerElement(mapToolsStore.selectedTool);
+					previewMarker = new maplibregl.Marker({ element: markerEl })
+						.setLngLat([lng, lat])
+						.addTo(map);
+
 					mapToolsStore.openDialogue({ lng, lat }, { x, y });
+				}
+			});
+
+			// Load and display user locations
+			loadLocations().then((locations) => {
+				const source = map.getSource('user-locations') as maplibregl.GeoJSONSource;
+				if (source) {
+					source.setData(locations);
 				}
 			});
 		});
