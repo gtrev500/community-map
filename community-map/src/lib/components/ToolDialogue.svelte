@@ -59,21 +59,69 @@
 		if (!mapToolsStore.screenPosition) return '';
 
 		const offset = 10; // pixels to offset from cursor
+		const padding = 10; // minimum padding from viewport edges
 		let x = mapToolsStore.screenPosition.x + offset;
 		let y = mapToolsStore.screenPosition.y + offset;
+		let maxHeight = '80vh'; // default max height
 
 		// Adjust if dialogue would go off screen
 		if (dialogueElement) {
 			const rect = dialogueElement.getBoundingClientRect();
-			if (x + rect.width > window.innerWidth) {
+			const viewportWidth = window.innerWidth;
+			const viewportHeight = window.innerHeight;
+
+			// Check right edge
+			if (x + rect.width + padding > viewportWidth) {
+				// Try positioning to the left of cursor
 				x = mapToolsStore.screenPosition.x - rect.width - offset;
+				// If still off-screen (too far left), clamp to viewport
+				if (x < padding) {
+					x = viewportWidth - rect.width - padding;
+				}
 			}
-			if (y + rect.height > window.innerHeight) {
-				y = mapToolsStore.screenPosition.y - rect.height - offset;
+
+			// Check left edge
+			if (x < padding) {
+				x = padding;
+			}
+
+			// Check bottom edge - calculate available space
+			const availableSpaceBelow = viewportHeight - (mapToolsStore.screenPosition.y + offset + padding);
+			const availableSpaceAbove = mapToolsStore.screenPosition.y - offset - padding;
+
+			if (rect.height + padding > availableSpaceBelow) {
+				// Not enough space below, try above
+				if (availableSpaceAbove > availableSpaceBelow) {
+					// More space above, position above cursor
+					y = mapToolsStore.screenPosition.y - rect.height - offset;
+					maxHeight = `${Math.min(availableSpaceAbove, viewportHeight * 0.8)}px`;
+
+					// If still doesn't fit, clamp to top
+					if (y < padding) {
+						y = padding;
+						maxHeight = `${availableSpaceAbove}px`;
+					}
+				} else {
+					// Keep below but limit height to available space
+					maxHeight = `${availableSpaceBelow}px`;
+				}
+			}
+
+			// Check top edge
+			if (y < padding) {
+				y = padding;
+			}
+
+			// Final safety checks - ensure dialogue fits in viewport
+			if (x + rect.width > viewportWidth) {
+				x = viewportWidth - rect.width - padding;
+			}
+			if (y + rect.height > viewportHeight) {
+				y = Math.max(padding, viewportHeight - rect.height - padding);
 			}
 		}
 
-		return `left: ${x}px; top: ${y}px;`;
+		return `left: ${x}px; top: ${y}px; max-height: ${maxHeight};`;
 	});
 
 	async function handleSave() {
@@ -229,7 +277,7 @@
 	<!-- Dialogue positioned at cursor -->
 	<div
 		bind:this={dialogueElement}
-		class="fixed z-30 bg-white rounded shadow-md p-3 border border-gray-200 max-h-[80vh] overflow-y-auto"
+		class="fixed z-30 bg-white rounded shadow-md p-3 border border-gray-200 overflow-y-auto"
 		class:w-64={mapToolsStore.dialogueMode === 'create-location'}
 		class:w-80={mapToolsStore.dialogueMode === 'view-location'}
 		style={dialogueStyle}
