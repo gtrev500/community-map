@@ -2,6 +2,10 @@
 
 An interactive web application for mapping and tracking community resources across California, including ice sightings, homeless shelters, and food banks. Users can add locations, view existing markers, and engage through comments.
 
+**HackCC 2025 Hackathon Entry** - Social Good Category
+
+This project was created for the HackCC 2025 hackathon, addressing the need for transparent community resource tracking and reporting. By enabling users to document and share locations of community resources and concerns, this tool empowers communities to stay informed and support each other.
+
 ## Features
 
 - **Interactive Map Interface**: MapLibre GL-based map of California with district boundaries
@@ -14,6 +18,23 @@ An interactive web application for mapping and tracking community resources acro
 - **Spatial Intelligence**: Automatic city detection based on coordinates using PostGIS
 - **Visual Legend**: Color-coded pins and legend for easy resource identification
 - **Real-time Updates**: Locations and comments update immediately after submission
+
+## Screenshots
+
+### Landing Page
+![Landing Page](LANDING.png)
+
+### Main Map Interface
+![Main Interface](MAIN.png)
+
+### Adding a Location
+![Adding Location](ADDING.png)
+
+### Submission Form
+![Submission Form](SUBMISSION.png)
+
+### Food Bank Example
+![Food Bank Location](FOOD_BANK.png)
 
 ## Tech Stack
 
@@ -30,73 +51,19 @@ An interactive web application for mapping and tracking community resources acro
 - **Martin** - High-performance map tile server
 - **postgres.js** - PostgreSQL client for Node.js
 
-## Prerequisites
-
-- **Node.js** 18+ and npm
-- **Docker** and Docker Compose
-- **Python 3** (for boundary data import scripts)
-
 ## Setup
 
-### 1. Clone the Repository
+For complete installation and setup instructions, see [SETUP.md](SETUP.md).
 
-```bash
-git clone <repository-url>
-cd community-map
-```
-
-### 2. Start Database Services
-
+Quick start:
 ```bash
 docker compose up -d
-```
-
-This starts:
-- PostgreSQL/PostGIS database on port 5432
-- Martin tile server on port 3000
-
-Verify services are running:
-```bash
-docker compose ps
-```
-
-### 3. Import Boundary Data
-
-Import California city and district boundaries:
-
-```bash
-# Install Python dependencies
 pip install -r requirements.txt
-
-# Import boundaries into PostGIS
 python import_boundaries.py
-```
-
-### 4. Install Application Dependencies
-
-```bash
-cd community-map
-npm install
-```
-
-### 5. Run Database Migrations
-
-```bash
+cd community-map && npm install
 npm run migrate
-```
-
-This creates:
-- `user_locations` table for storing map markers
-- `location_comments` table for user comments
-- SQL functions for data operations
-
-### 6. Start Development Server
-
-```bash
 npm run dev
 ```
-
-The application will be available at http://localhost:5173
 
 ## Usage
 
@@ -273,80 +240,6 @@ npm run check      # Run Svelte/TypeScript checks
 npm run migrate    # Run database migrations
 ```
 
-### Testing
-
-#### Manual UI Testing
-```bash
-npm run dev
-# Open http://localhost:5173 and test features
-```
-
-#### API Testing
-```bash
-# Get all locations
-curl http://localhost:5173/api/locations
-
-# Add a location
-curl -X POST http://localhost:5173/api/locations \
-  -H "Content-Type: application/json" \
-  -d '{"tool":"Ice sighting","coordinates":[-118.2437,34.0522],"agents":5}'
-
-# Get comments
-curl http://localhost:5173/api/comments?location_id=1
-
-# Add a comment
-curl -X POST http://localhost:5173/api/comments \
-  -H "Content-Type: application/json" \
-  -d '{"location_id":1,"comment_text":"Test comment"}'
-```
-
-#### Database Inspection
-```bash
-# Connect to database
-docker exec -it postgis psql -U postgres -d gis
-
-# View locations
-SELECT id, tool_type, city_name, note FROM user_locations;
-
-# View comments
-SELECT lc.*, ul.tool_type
-FROM location_comments lc
-JOIN user_locations ul ON lc.location_id = ul.id;
-```
-
-## Environment Variables
-
-Create `.env` file in `community-map/` directory:
-
-```
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/gis
-```
-
-## Troubleshooting
-
-### Services won't start
-```bash
-docker compose down
-docker compose up -d
-docker compose ps  # Check status
-```
-
-### Migration errors
-If tables already exist:
-```sql
--- Connect to database first
-docker exec -it postgis psql -U postgres -d gis
-
--- Drop and recreate
-DROP TABLE IF EXISTS location_comments CASCADE;
-DROP TABLE IF EXISTS user_locations CASCADE;
-```
-
-Then re-run: `npm run migrate`
-
-### Port conflicts
-If port 5432 or 3000 is in use, modify `docker-compose.yaml` to use different ports.
-
 ## Known Limitations
 
 - No user authentication (all submissions are anonymous)
@@ -368,14 +261,6 @@ If port 5432 or 3000 is in use, modify `docker-compose.yaml` to use different po
 - Export data to CSV/GeoJSON
 - Admin dashboard for moderation
 - Search and filter functionality
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
